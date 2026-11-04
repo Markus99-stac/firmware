@@ -6,8 +6,21 @@ import subprocess
 import threading
 import serial.tools.list_ports
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ESPTOOL = os.path.join(BASE_DIR, "esptool-windows-amd64", "esptool.exe")
+# ---------- Кросс-платформенные пути ----------
+if getattr(sys, 'frozen', False):
+    # Собранное приложение (PyInstaller) — ресурсы в _MEIPASS
+    BASE_DIR = sys._MEIPASS
+else:
+    # Режим разработки
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Выбор папки и имени esptool в зависимости от ОС
+if sys.platform == "darwin":
+    ESPTOOL = os.path.join(BASE_DIR, "esptool-macos-arm64", "esptool")
+elif sys.platform == "win32":
+    ESPTOOL = os.path.join(BASE_DIR, "esptool-windows-amd64", "esptool.exe")
+else:
+    ESPTOOL = os.path.join(BASE_DIR, "esptool", "esptool")
 
 APP_NAME = "Firmware Flasher"
 APP_VERSION = "1.0.0"
@@ -67,23 +80,33 @@ def find_boot_app0(folder=None):
             return p
 
     candidates = [
+        # Windows — портативная установка рядом с программой
         os.path.join(BASE_DIR, "esp32", "hardware", "esp32", "3.3.7",
                      "tools", "partitions", "boot_app0.bin"),
+        # Windows — Arduino15
         os.path.join(os.environ.get("LOCALAPPDATA", ""), "Arduino15", "packages",
                      "esp32", "hardware", "esp32", "3.3.7",
                      "tools", "partitions", "boot_app0.bin"),
+        # macOS — Arduino15
+        os.path.expanduser("~/Library/Arduino15/packages/esp32/hardware/esp32/3.3.7/"
+                           "tools/partitions/boot_app0.bin"),
     ]
     for p in candidates:
-        if os.path.exists(p):
+        if p and os.path.exists(p):
             return p
 
-    base = os.path.join(os.environ.get("LOCALAPPDATA", ""), "Arduino15",
-                        "packages", "esp32", "hardware", "esp32")
-    if os.path.isdir(base):
-        for ver in os.listdir(base):
-            p = os.path.join(base, ver, "tools", "partitions", "boot_app0.bin")
-            if os.path.exists(p):
-                return p
+    # fallback: любая версия ядра
+    bases = [
+        os.path.join(os.environ.get("LOCALAPPDATA", ""), "Arduino15",
+                     "packages", "esp32", "hardware", "esp32"),
+        os.path.expanduser("~/Library/Arduino15/packages/esp32/hardware/esp32"),
+    ]
+    for base in bases:
+        if os.path.isdir(base):
+            for ver in os.listdir(base):
+                p = os.path.join(base, ver, "tools", "partitions", "boot_app0.bin")
+                if os.path.exists(p):
+                    return p
     return None
 
 
@@ -131,7 +154,7 @@ def run_command(cmd: list, description: str):
     log(" ".join(cmd))
 
     if not os.path.exists(ESPTOOL):
-        log(f"[ОШИБКА] Не найден esptool.exe: {ESPTOOL}")
+        log(f"[ОШИБКА] Не найден esptool: {ESPTOOL}")
         return
 
     try:
@@ -153,7 +176,7 @@ def run_command(cmd: list, description: str):
 # ---------- Обработчики ----------
 def on_open_port():
     refresh_ports()
-    log("Список COM-портов обновлён")
+    log("Список портов обновлён")
 
 
 def on_close_port():
@@ -171,7 +194,7 @@ def on_browse_folder():
 def on_execute():
     port_text = win.comboBox.currentText()
     if not port_text:
-        log("[ОШИБКА] Выберите COM-порт")
+        log("[ОШИБКА] Выберите порт")
         return
     port = port_text.split(" ")[0]
 

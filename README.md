@@ -12,8 +12,19 @@
 
 # Инструкция для сборки
 
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pillow
+
+python3 -c "from PIL import Image; Image.open('downloads_icon.ico').save('downloads_icon.icns')"
+
+
+python3 -m pip install pillow
+
+pip install pyserial
+
     pip install pyinstaller
-    pyinstaller --onefile your_script.py
+    pyinstaller --noconfirm Firmware.spec
 
 #
 

@@ -1,16 +1,21 @@
-# Firmware.spec (для macOS)
+# -*- mode: python ; coding: utf-8 -*-
+
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
     datas=[
         ('firmware.ui', '.'),
-        ('downloads_icon.ico', '.'),
+        ('downloads_icon.icns', '.'),
         ('new_file.ico', '.'),
         ('run.ico', '.'),
-        ('esptool-macos-arm64', 'esptool-macos-arm64'), # Папка с Mac-бинарниками
+        ('esptool-macos-arm64', 'esptool-macos-arm64'),
     ],
-    hiddenimports=['serial', 'serial.tools.list_ports'],
+    hiddenimports=[
+        'serial',
+        'serial.tools',
+        'serial.tools.list_ports',
+    ],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
@@ -29,15 +34,15 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,            # UPX на macOS часто ломает бинарники — лучше выключить
     console=False,
-    icon='downloads_icon.ico', # PyInstaller конвертирует в .icns, если установлен Pillow
+    icon='downloads_icon.icns',
 )
 
 app = BUNDLE(
     exe,
     name='Firmware.app',
-    icon='downloads_icon.ico',
+    icon='downloads_icon.icns',
     bundle_identifier='com.ams_spectre.firmware',
     version='1.0.0',
 )
