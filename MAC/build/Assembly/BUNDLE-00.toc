@@ -1,3 +1,0 @@
-([('Firmware',
-   '/Users/spectre/Different_projects/firmware/MAC/dist/Firmware',
-   'EXECUTABLE')],)

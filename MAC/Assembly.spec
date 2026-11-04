@@ -34,7 +34,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=False,            # UPX на macOS часто ломает бинарники — лучше выключить
+    upx=False,            
     console=False,
     icon='downloads_icon.icns',
 )

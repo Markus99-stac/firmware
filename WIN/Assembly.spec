@@ -8,8 +8,6 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[
-        # Если хотите встроить esptool внутрь exe — можно добавить так,
-        # но проще через datas (папка целиком).
     ],
     datas=[
         ('firmware.ui', '.'),

@@ -8,7 +8,6 @@ import serial.tools.list_ports
 
 # ---------- Кросс-платформенные пути ----------
 if getattr(sys, 'frozen', False):
-    # Собранное приложение (PyInstaller) — ресурсы в _MEIPASS
     BASE_DIR = sys._MEIPASS
 else:
     # Режим разработки
@@ -95,7 +94,6 @@ def find_boot_app0(folder=None):
         if p and os.path.exists(p):
             return p
 
-    # fallback: любая версия ядра
     bases = [
         os.path.join(os.environ.get("LOCALAPPDATA", ""), "Arduino15",
                      "packages", "esp32", "hardware", "esp32"),
