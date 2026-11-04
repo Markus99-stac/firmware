@@ -1,0 +1,49 @@
+# myapp.spec
+import sys
+from PyInstaller.utils.hooks import collect_data_files
+
+block_cipher = None
+
+a = Analysis(
+    ['main.py'],
+    pathex=[],
+    binaries=[
+        # Если хотите встроить esptool внутрь exe — можно добавить так,
+        # но проще через datas (папка целиком).
+    ],
+    datas=[
+        ('firmware.ui', '.'),
+        ('downloads_icon.ico', '.'),
+        ('new_file.ico', '.'),
+        ('run.ico', '.'),
+        ('esptool-windows-amd64', 'esptool-windows-amd64'),
+    ],
+    hiddenimports=['serial','serial.tools.list_ports'],
+    hookspath=[],
+    runtime_hooks=[],
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='Firmware',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,
+    icon='downloads_icon.ico',
+)
